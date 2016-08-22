@@ -1,24 +1,29 @@
-FROM openjdk:8-jdk
+## -*- docker-image-name: "mcreations/jenkins" -*-
 
-RUN apt-get update && apt-get install -y git curl && rm -rf /var/lib/apt/lists/*
+FROM mcreations/openwrt-java:8
+MAINTAINER Kambiz Darabi <darabi@m-creations.net>
 
-ENV JENKINS_HOME /var/jenkins_home
+RUN opkg update && opkg install git curl zip shadow-useradd shadow-groupadd coreutils-sha1sum
+
+ENV JENKINS_HOME /data/jenkins_home
 ENV JENKINS_SLAVE_AGENT_PORT 50000
 
 ARG user=jenkins
 ARG group=jenkins
-ARG uid=1000
-ARG gid=1000
+ARG uid=201
+ARG gid=201
 
-# Jenkins is run with user `jenkins`, uid = 1000
+# Jenkins is run with user `jenkins`
 # If you bind mount a volume from the host or a data container, 
 # ensure you use the same uid
 RUN groupadd -g ${gid} ${group} \
-    && useradd -d "$JENKINS_HOME" -u ${uid} -g ${gid} -m -s /bin/bash ${user}
+    && mkdir -p /data \
+    && useradd -d "$JENKINS_HOME" -u ${uid} -g ${gid} -m -s /bin/bash ${user} \
+    && chown -R jenkins:jenkins "${JENKINS_HOME}"
 
 # Jenkins home directory is a volume, so configuration and build history 
 # can be persisted and survive image upgrades
-VOLUME /var/jenkins_home
+VOLUME ${JENKINS_HOME}
 
 # `/usr/share/jenkins/ref/` contains all reference configuration we want 
 # to set on a fresh new installation. Use it to bundle additional plugins 
