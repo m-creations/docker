@@ -1,39 +1,39 @@
-# Official Jenkins Docker image
+# Infficial tiny Jenkins image 
 
-The Jenkins Continuous Integration and Delivery server.
+The Jenkins Continuous Integration and Delivery server based on an
+OpenWRT image with small footprint and (in contrast to the Alpine
+version of the official image) with glibc support.
 
 This is a fully functional Jenkins server, based on the Long Term Support release.
 [http://jenkins.io/](http://jenkins.io/).
 
-For weekly releases check out [`jenkinsci/jenkins`](https://hub.docker.com/r/jenkinsci/jenkins/)
-
+For the latest release check out [`mcreations/jenkins`](https://hub.docker.com/r/mcreations/jenkins/)
 
 <img src="http://jenkins-ci.org/sites/default/files/jenkins_logo.png"/>
-
 
 # Usage
 
 ```
-docker run -p 8080:8080 -p 50000:50000 jenkins
+docker run -p 8080:8080 -p 50000:50000 mcreations/jenkins
 ```
 
 NOTE: read below the _build executors_ part for the role of the `50000` port mapping.
 
-This will store the workspace in /var/jenkins_home. All Jenkins data lives in there - including plugins and configuration.
+This will store the workspace in /data/jenkins_home. All Jenkins data lives in there - including plugins and configuration.
 You will probably want to make that a persistent volume (recommended):
 
 ```
-docker run -p 8080:8080 -p 50000:50000 -v /your/home:/var/jenkins_home jenkins
+docker run -p 8080:8080 -p 50000:50000 -v /your/jenkins_home:/data/jenkins_home jenkins
 ```
 
-This will store the jenkins data in `/your/home` on the host.
-Ensure that `/your/home` is accessible by the jenkins user in container (jenkins user - uid 1000) or use `-u some_other_user` parameter with `docker run`.
+This will store the jenkins data in `/your/jenkins_home` on the host.
+Ensure that `/your/jenkins_home` is accessible by the jenkins user in container with uid 200.
 
 
 You can also use a volume container:
 
 ```
-docker run --name myjenkins -p 8080:8080 -p 50000:50000 -v /var/jenkins_home jenkins
+docker run --name myjenkins -p 8080:8080 -p 50000:50000 -v /data/jenkins_home jenkins
 ```
 
 Then myjenkins container has the volume (please do read about docker volume handling to find out more).
@@ -45,7 +45,7 @@ If you bind mount in a volume - you can simply back up that directory
 
 This is highly recommended. Treat the jenkins_home directory as you would a database - in Docker you would generally put a database on a volume.
 
-If your volume is inside a container - you can use ```docker cp $ID:/var/jenkins_home``` command to extract the data, or other options to find where the volume data is.
+If your volume is inside a container - you can use ```docker cp $ID:/data/jenkins_home``` command to extract the data, or other options to find where the volume data is.
 Note that some symlinks on some OSes may be converted to copies (this can confuse jenkins with lastStableBuild links etc)
 
 For more info check Docker docs section on [Managing data in containers](https://docs.docker.com/userguide/dockervolumes/)
@@ -97,7 +97,7 @@ handlers=java.util.logging.ConsoleHandler
 jenkins.level=FINEST
 java.util.logging.ConsoleHandler.level=FINEST
 EOF
-docker run --name myjenkins -p 8080:8080 -p 50000:50000 --env JAVA_OPTS="-Djava.util.logging.config.file=/var/jenkins_home/log.properties" -v `pwd`/data:/var/jenkins_home jenkins
+docker run --name myjenkins -p 8080:8080 -p 50000:50000 --env JAVA_OPTS="-Djava.util.logging.config.file=/data/jenkins_home/log.properties" -v `pwd`/data:/data/jenkins_home jenkins
 ```
 
 
@@ -135,13 +135,13 @@ docker run --name myjenkins -p 8080:8080 -p 50001:50001 --env JENKINS_SLAVE_AGEN
 
 # Installing more tools
 
-You can run your container as root - and install via apt-get, install as part of build steps via jenkins tool installers, or you can create your own Dockerfile to customise, for example:
+You can run your container as root - and install via opkg (OpenWRT's default package manager), install as part of build steps via jenkins tool installers, or you can create your own Dockerfile to customise, for example:
 
 ```
 FROM jenkins
 # if we want to install via apt
 USER root
-RUN apt-get update && apt-get install -y ruby make more-thing-here
+RUN opkg update && opkg install ruby make more-thing-here
 USER jenkins # drop back to the regular jenkins user - good practice
 ```
 
@@ -202,7 +202,7 @@ which may be inappropriate.
 
 # Upgrading
 
-All the data needed is in the /var/jenkins_home directory - so depending on how you manage that - depends on how you upgrade. Generally - you can copy it out - and then "docker pull" the image again - and you will have the latest LTS - you can then start up with -v pointing to that data (/var/jenkins_home) and everything will be as you left it.
+All the data needed is in the /data/jenkins_home directory - so depending on how you manage that - depends on how you upgrade. Generally - you can copy it out - and then "docker pull" the image again - and you will have the latest LTS - you can then start up with -v pointing to that data (/data/jenkins_home) and everything will be as you left it.
 
 As always - please ensure that you know how to drive docker - especially volume handling!
 
@@ -226,4 +226,4 @@ Bats can be easily installed with `brew install bats` on OS X
 
 # Questions?
 
-Jump on irc.freenode.net and the #jenkins room. Ask!
+In case of questions, please send an email to docker-team@m-creations.com or open an issue at https://github.com/m-creations/docker-jenkins.
