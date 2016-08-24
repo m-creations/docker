@@ -1,4 +1,4 @@
-# Infficial tiny Jenkins image 
+# Inofficial tiny Jenkins image 
 
 The Jenkins Continuous Integration and Delivery server based on an
 OpenWRT image with small footprint and (in contrast to the Alpine
