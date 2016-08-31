@@ -1,0 +1,36 @@
+#!/bin/bash
+mkdir -p $JENKINS_HOME
+mkdir -p $MAVEN_REPO
+export JENKINS_DOT_M2="$JENKINS_HOME/.m2"
+mkdir -p "$JENKINS_DOT_M2"
+
+if [ ! -d "$JENKINS_HOME/.bashrc" ]; then
+  cp /root/.bashrc $JENKINS_HOME/
+  cat <<EOF >> $JENKINS_HOME/.bashrc
+export HOME="$JENKINS_HOME"
+export USER="${user}"
+export PATH=${MAVEN_HOME}/bin:$PATH
+EOF
+fi
+
+[ "$(ls -A $IMPORT_SSL_CERTIFICATES_HOME)" ] && : || NO_CRT_FILES="true"
+
+# importing certificate files into system and jvm
+if [ -z "$NO_CRT_FILES" ]; then
+  echo "Importing SSL certificates ..."
+  mkdir -p "$IMPORT_SSL_CERTIFICATES_HOME/imported"
+  #mkdir -p "$SSL_CERTIFICATES_DEST_HOME"
+  for f in $IMPORT_SSL_CERTIFICATES_HOME/*.crt; do
+    fname=$(basename "$f")
+    fbasename="${fname%.*}"
+    #cp "$f" "$SSL_CERTIFICATES_DEST_HOME" && \
+    $JAVA_HOME/bin/keytool -import -storepass changeit -trustcacerts -noprompt -alias $fbasename -file $f -keystore $JAVA_HOME/lib/security/cacerts && \
+    mv "$f" "$IMPORT_SSL_CERTIFICATES_HOME/imported/" && \
+    printf "\n=== Successfully imported $f\n" && \
+    gzip -9 $IMPORT_SSL_CERTIFICATES_HOME/imported/$fname || \
+    printf "\n=== Error while importing $f\n"
+    echo
+  done
+fi
+
+. /usr/local/bin/jenkins.sh
