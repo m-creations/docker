@@ -1,6 +1,6 @@
 ## -*- docker-image-name: "mcreations/jenkins" -*-
 
-FROM mcreations/openwrt-java:8
+FROM mcreations/openwrt-java:jdk8
 MAINTAINER Kambiz Darabi <darabi@m-creations.net>
 MAINTAINER Reza Rahimi <rahimi@m-creations.net>
 
@@ -78,7 +78,7 @@ RUN mkdir -p $JENKINS_HOME \
   && rm -f /tmp/maven.tgz \
   && chown -R jenkins:jenkins "${JENKINS_HOME}" /usr/share/jenkins/ref \
   && sed -i "s#\(</settings>\)#<localRepository>${MAVEN_REPO}</localRepository>\n\1#g" $MAVEN_HOME/conf/settings.xml \
-  && chmod 774 "$JAVA_HOME/lib/security/cacerts" \
+  && chmod 774 "$JAVA_HOME/jre/lib/security/cacerts" \
   && chmod 775 "$SSL_CERTIFICATES_DEST_HOME"
 
 # for main web interface:

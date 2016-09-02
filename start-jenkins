@@ -19,12 +19,11 @@ fi
 if [ -z "$NO_CRT_FILES" ]; then
   echo "Importing SSL certificates ..."
   mkdir -p "$IMPORT_SSL_CERTIFICATES_HOME/imported"
-  #mkdir -p "$SSL_CERTIFICATES_DEST_HOME"
   for f in $IMPORT_SSL_CERTIFICATES_HOME/*.crt; do
     fname=$(basename "$f")
     fbasename="${fname%.*}"
-    #cp "$f" "$SSL_CERTIFICATES_DEST_HOME" && \
-    $JAVA_HOME/bin/keytool -import -storepass changeit -trustcacerts -noprompt -alias $fbasename -file $f -keystore $JAVA_HOME/lib/security/cacerts && \
+    cp "$f" "$SSL_CERTIFICATES_DEST_HOME" && \
+    $JAVA_HOME/bin/keytool -import -storepass changeit -trustcacerts -noprompt -alias $fbasename -file $f -keystore $JAVA_HOME/jre/lib/security/cacerts && \
     mv "$f" "$IMPORT_SSL_CERTIFICATES_HOME/imported/" && \
     printf "\n=== Successfully imported $f\n" && \
     gzip -9 $IMPORT_SSL_CERTIFICATES_HOME/imported/$fname || \
