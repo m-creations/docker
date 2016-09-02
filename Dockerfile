@@ -4,7 +4,7 @@ FROM mcreations/openwrt-java:jdk8
 MAINTAINER Kambiz Darabi <darabi@m-creations.net>
 MAINTAINER Reza Rahimi <rahimi@m-creations.net>
 
-RUN opkg update && opkg install git curl zip shadow-useradd shadow-groupadd coreutils-sha1sum coreutils-sha256sum git-http openssl-util
+RUN opkg update && opkg install git curl zip shadow-useradd shadow-groupadd coreutils-sha1sum coreutils-sha256sum git-http openssl-util libltdl
 
 ENV JENKINS_HOME /data/jenkins_home
 ENV HOME /data/jenkins_home
