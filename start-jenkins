@@ -13,6 +13,8 @@ if [ ! -d "$JENKINS_HOME/.bashrc" ]; then
 export HOME="$JENKINS_HOME"
 export USER="${user}"
 export PATH=${MAVEN_HOME}/bin:$PATH
+export JAVA_OPTS="${JAVA_OPTS} -Djavax.net.ssl.trustStore=${JAVA_SECURITY_KEYSTORE_PATH}"
+export MAVEN_OPTS="${MAVEN_OPTS} -Djavax.net.ssl.trustStore=${JAVA_SECURITY_KEYSTORE_PATH}"
 EOF
 fi
 
@@ -43,5 +45,6 @@ if [ -z "$NO_CRT_FILES" ]; then
 fi
 
 export JAVA_OPTS="$JAVA_OPTS -Djavax.net.ssl.trustStore=$JAVA_SECURITY_KEYSTORE_PATH"
+export MAVEN_OPTS="$MAVEN_OPTS -Djavax.net.ssl.trustStore=$JAVA_SECURITY_KEYSTORE_PATH"
 
 . /usr/local/bin/jenkins.sh
