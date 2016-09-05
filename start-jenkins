@@ -16,7 +16,14 @@ export PATH=${MAVEN_HOME}/bin:$PATH
 EOF
 fi
 
-[ "$(ls -A $SSL_CERTIFICATES_HOME)" ] && : || NO_CRT_FILES="true"
+files=$(shopt -s nullglob dotglob; echo $SSL_CERTIFICATES_HOME/*.crt)
+if (( ${#files} ))
+then
+  echo "Some *.crt files found to import"
+else
+  echo "No *.crt files found to import"
+  NO_CRT_FILES="true"
+fi
 
 # importing certificate files into system and jvm
 if [ -z "$NO_CRT_FILES" ]; then
