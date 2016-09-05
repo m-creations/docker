@@ -35,6 +35,6 @@ if [ -z "$NO_CRT_FILES" ]; then
   done
 fi
 
-export JAVA_ARGS="$JAVA_ARGS -Djavax.net.ssl.trustStore=$JAVA_SECURITY_KEYSTORE_PATH"
+export JAVA_OPTS="$JAVA_OPTS -Djavax.net.ssl.trustStore=$JAVA_SECURITY_KEYSTORE_PATH"
 
 . /usr/local/bin/jenkins.sh
