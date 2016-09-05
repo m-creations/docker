@@ -30,8 +30,10 @@ RUN groupadd -g ${gid} ${group} \
 # can be persisted and survive image upgrades
 VOLUME /data
 
-ENV IMPORT_SSL_CERTIFICATES_HOME /data/ssl
+ENV SSL_CERTIFICATES_HOME /data/ssl
 ENV SSL_CERTIFICATES_DEST_HOME /etc/ssl/certs
+ENV JAVA_SECURITY_KEYSTORE_HOME $SSL_CERTIFICATES_HOME/keystore
+ENV JAVA_SECURITY_KEYSTORE_PATH $JAVA_SECURITY_KEYSTORE_HOME/cacerts
 
 # `/usr/share/jenkins/ref/` contains all reference configuration we want
 # to set on a fresh new installation. Use it to bundle additional plugins
@@ -70,7 +72,7 @@ ENV MAVEN_REPO /data/jenkins_home/maven-repository
 
 ENV JENKINS_UC https://updates.jenkins.io
 RUN mkdir -p $JENKINS_HOME \
-  && mkdir -p $IMPORT_SSL_CERTIFICATES_HOME \
+  && mkdir -p $SSL_CERTIFICATES_HOME \
   && wget -O /tmp/maven.tgz --progress=dot:giga $MAVEN_DOWNLOAD_URL \
   && cd /tmp/ \
   && tar -xvzf maven.tgz \
@@ -78,7 +80,7 @@ RUN mkdir -p $JENKINS_HOME \
   && rm -f /tmp/maven.tgz \
   && chown -R jenkins:jenkins "${JENKINS_HOME}" /usr/share/jenkins/ref \
   && sed -i "s#\(</settings>\)#<localRepository>${MAVEN_REPO}</localRepository>\n\1#g" $MAVEN_HOME/conf/settings.xml \
-  && chmod 774 "$JAVA_HOME/jre/lib/security/cacerts" \
+  && chown -R jenkins:root /data \
   && chmod 775 "$SSL_CERTIFICATES_DEST_HOME"
 
 # for main web interface:
