@@ -1,6 +1,8 @@
 #!/bin/bash
 mkdir -p $JAVA_SECURITY_KEYSTORE_HOME
-if [ ! -f "$JAVA_SECURITY_KEYSTORE_PATH" ]; then
+if [ -f "$JAVA_SECURITY_KEYSTORE_PATH" ]; then
+  cp -rf "$JAVA_SECURITY_KEYSTORE_PATH" "$JAVA_HOME/jre/lib/security/cacerts"
+else
   cp -rf "$JAVA_HOME/jre/lib/security/cacerts" "$JAVA_SECURITY_KEYSTORE_PATH"
 fi
 

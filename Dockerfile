@@ -81,6 +81,7 @@ RUN mkdir -p $JENKINS_HOME \
   && chown -R jenkins:jenkins "${JENKINS_HOME}" /usr/share/jenkins/ref \
   && sed -i "s#\(</settings>\)#<localRepository>${MAVEN_REPO}</localRepository>\n\1#g" $MAVEN_HOME/conf/settings.xml \
   && chown -R jenkins:root /data \
+  && chown -R jenkins:root "$JAVA_HOME" \
   && chmod 775 "$SSL_CERTIFICATES_DEST_HOME"
 
 # for main web interface:
