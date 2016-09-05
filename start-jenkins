@@ -1,6 +1,8 @@
 #!/bin/bash
 mkdir -p $JAVA_SECURITY_KEYSTORE_HOME
-cp -rf "$JAVA_HOME/jre/lib/security/cacerts" "$JAVA_SECURITY_KEYSTORE_PATH"
+if [ ! -f "$JAVA_SECURITY_KEYSTORE_PATH" ]; then
+  cp -rf "$JAVA_HOME/jre/lib/security/cacerts" "$JAVA_SECURITY_KEYSTORE_PATH"
+fi
 
 mkdir -p $JENKINS_HOME
 mkdir -p $MAVEN_REPO
@@ -11,10 +13,10 @@ if [ ! -d "$JENKINS_HOME/.bashrc" ]; then
   cp /root/.bashrc $JENKINS_HOME/
   cat <<EOF >> $JENKINS_HOME/.bashrc
 export HOME="$JENKINS_HOME"
-export USER="${user}"
+export USER="jenkins"
 export PATH=${MAVEN_HOME}/bin:$PATH
-export JAVA_OPTS="${JAVA_OPTS} -Djavax.net.ssl.trustStore=${JAVA_SECURITY_KEYSTORE_PATH}"
-export MAVEN_OPTS="${MAVEN_OPTS} -Djavax.net.ssl.trustStore=${JAVA_SECURITY_KEYSTORE_PATH}"
+export JAVA_OPTS="$JAVA_OPTS -Djavax.net.ssl.trustStore=${JAVA_SECURITY_KEYSTORE_PATH}"
+export MAVEN_OPTS="$MAVEN_OPTS -Djavax.net.ssl.trustStore=${JAVA_SECURITY_KEYSTORE_PATH}"
 EOF
 fi
 
@@ -45,6 +47,6 @@ if [ -z "$NO_CRT_FILES" ]; then
 fi
 
 export JAVA_OPTS="$JAVA_OPTS -Djavax.net.ssl.trustStore=$JAVA_SECURITY_KEYSTORE_PATH"
-export MAVEN_OPTS="$MAVEN_OPTS -Djavax.net.ssl.trustStore=$JAVA_SECURITY_KEYSTORE_PATH"
+export MAVEN_OPTS="$MAVEN_OPTS -Djavax.net.SSLl.trustStore=$JAVA_SECURITY_KEYSTORE_PATH"
 
 . /usr/local/bin/jenkins.sh
