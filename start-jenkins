@@ -28,8 +28,8 @@ if [ -z "$NO_CRT_FILES" ]; then
     cp "$f" "$SSL_CERTIFICATES_DEST_HOME" && \
     $JAVA_HOME/bin/keytool -import -storepass changeit -trustcacerts -noprompt -alias $fbasename -file $f -keystore $JAVA_SECURITY_KEYSTORE_PATH && \
     mv "$f" "$SSL_CERTIFICATES_HOME/imported/" && \
-    printf "\n=== Successfully imported $f\n" && \
-    gzip -9 $SSL_CERTIFICATES_HOME/imported/$fname || \
+    gzip -9 $SSL_CERTIFICATES_HOME/imported/$fname && \
+    printf "\n=== Successfully imported $f\n" || \
     printf "\n=== Error while importing $f\n"
     echo
   done
