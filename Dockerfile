@@ -1,10 +1,20 @@
 ## -*- docker-image-name: "mcreations/jenkins" -*-
 
 FROM mcreations/openwrt-java:jdk8
-MAINTAINER Kambiz Darabi <darabi@m-creations.net>
 MAINTAINER Reza Rahimi <rahimi@m-creations.net>
 
-RUN opkg update && opkg install git curl zip shadow-useradd shadow-groupadd coreutils-sha1sum coreutils-sha256sum git-http openssl-util libltdl
+RUN opkg update \
+    && opkg install coreutils-sha1sum \
+                    coreutils-sha256sum \
+                    curl \
+                    git \
+                    git-http \
+                    libltdl \
+                    openssl-util \
+                    shadow-groupadd \
+                    shadow-useradd \
+                    shadow-usermod \
+                    zip
 
 ENV JENKINS_HOME /data/jenkins_home
 ENV HOME /data/jenkins_home
@@ -14,13 +24,15 @@ ARG user=jenkins
 ARG group=jenkins
 ARG uid=201
 ARG gid=201
+ARG host_docker_group_id=131
 
 # Jenkins is run with user `jenkins`
 # If you bind mount a volume from the host or a data container,
 # ensure you use the same uid
 RUN groupadd -g ${gid} ${group} \
     && mkdir -p /data \
-    && useradd -d "$JENKINS_HOME" -u ${uid} -g ${gid} -G root -m -s /bin/bash ${user} \
+    && groupadd -g ${host_docker_group_id} docker \
+    && useradd -d "$JENKINS_HOME" -u ${uid} -g ${gid} -G root,docker -m -s /bin/bash ${user} \
     && chown -R jenkins:jenkins "${JENKINS_HOME}" \
     && mkdir -p /data \
     && chown -R jenkins:root /data
