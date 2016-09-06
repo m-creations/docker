@@ -3,18 +3,21 @@
 FROM mcreations/openwrt-java:jdk8
 MAINTAINER Reza Rahimi <rahimi@m-creations.net>
 
+<<<<<<< c4723e816b8eee6b3ec5c86ddde1a2b7c3130993
 RUN opkg update \
     && opkg install coreutils-sha1sum \
                     coreutils-sha256sum \
                     curl \
                     git \
                     git-http \
+                    graphviz \
                     libltdl \
                     openssl-util \
                     shadow-groupadd \
                     shadow-useradd \
                     shadow-usermod \
-                    zip
+                    zip \
+     && dot -c
 
 ENV JENKINS_HOME /data/jenkins_home
 ENV HOME /data/jenkins_home
