@@ -3,9 +3,11 @@
 FROM mcreations/openwrt-java:jdk8
 MAINTAINER Reza Rahimi <rahimi@m-creations.net>
 
+<<<<<<< cc2b283aa5ac22f51869e8d31d94f092f751083f
 <<<<<<< c4723e816b8eee6b3ec5c86ddde1a2b7c3130993
 RUN opkg update \
-    && opkg install coreutils-sha1sum \
+    && opkg install coreutils-base64 \
+                    coreutils-sha1sum \
                     coreutils-sha256sum \
                     curl \
                     git \
