@@ -3,47 +3,45 @@
 FROM mcreations/openwrt-java:jdk8
 MAINTAINER Reza Rahimi <rahimi@m-creations.net>
 
-<<<<<<< bfcbb226d3a770dbecf2b4e28c27cd0e85bd48b1
-<<<<<<< cc2b283aa5ac22f51869e8d31d94f092f751083f
-<<<<<<< c4723e816b8eee6b3ec5c86ddde1a2b7c3130993
-RUN opkg update \
-    && opkg install coreutils-base64 \
-                    coreutils-sha1sum \
-                    coreutils-sha256sum \
-                    curl \
-                    git \
-                    git-http \
-                    graphviz \
-                    libltdl \
-                    openssh-client \
-                    openssl-util \
-                    shadow-groupadd \
-                    shadow-useradd \
-                    shadow-usermod \
-                    zip \
-     && dot -c
+RUN opkg update && opkg install \
+    coreutils-base64 \
+    coreutils-nohup \
+    coreutils-sha1sum \
+    coreutils-sha256sum \
+    curl \
+    git \
+    git-http \
+    graphviz \
+    libltdl \
+    openssh-client \
+    openssl-util \
+    shadow-groupadd \
+    shadow-groupmod \
+    shadow-su \
+    shadow-useradd \
+    shadow-usermod \
+    zip \
+    && dot -c
 
 ENV JENKINS_HOME /data/jenkins_home
 ENV HOME /data/jenkins_home
 ENV JENKINS_SLAVE_AGENT_PORT 50000
 
-ARG user=jenkins
-ARG group=jenkins
-ARG uid=201
-ARG gid=201
-ARG host_docker_group_id=131
+# the group ID of the docker group on the Docker host (for the permissions of the docker unix domain socket)
+ENV DOCKER_HOST_GID 131
+
+ENV JENKINS_UID 201
+ENV JENKINS_GID 201
 
 # Jenkins is run with user `jenkins`
 # If you bind mount a volume from the host or a data container,
 # ensure you use the same uid
-RUN groupadd -g ${gid} ${group} \
-    && mkdir -p /data \
-    && groupadd -g ${host_docker_group_id} docker \
-    && useradd -d "$JENKINS_HOME" -u ${uid} -g ${gid} -G root,docker -m -s /bin/bash ${user} \
-    && chown -R jenkins:jenkins "${JENKINS_HOME}" \
-    && mkdir -p /data \
-    && chown -R jenkins:root /data
-
+RUN groupadd -g ${JENKINS_GID} jenkins \
+    && groupadd -g ${DOCKER_HOST_GID} docker \
+    && mkdir -p ${JENKINS_HOME} \
+    && useradd -d "$JENKINS_HOME" -u ${JENKINS_UID} -g ${JENKINS_GID} -G docker -m -s /bin/bash jenkins \
+    && chown -R jenkins:root /data \
+    && chown -R jenkins:jenkins "${JENKINS_HOME}"
 
 # Jenkins home directory is a volume, so configuration and build history
 # can be persisted and survive image upgrades
@@ -111,14 +109,13 @@ EXPOSE 50000
 
 ENV COPY_REFERENCE_FILE_LOG $JENKINS_HOME/copy_reference_file.log
 
-USER ${user}
-
 COPY jenkins-support /usr/local/bin/jenkins-support
 COPY jenkins.sh /usr/local/bin/jenkins.sh
 
 COPY start-jenkins /
+COPY jenkins-chown-and-start /
 
-ENTRYPOINT ["/bin/tini","--","/start-jenkins"]
+CMD ["/jenkins-chown-and-start"]
 
 # from a derived Dockerfile, can use `RUN plugins.sh active.txt` to setup /usr/share/jenkins/ref/plugins from a support bundle
 COPY plugins.sh /usr/local/bin/plugins.sh

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# When we are started with a new JENKINS_UID/GID and DOCKER_HOST_GROUP_ID, we have to reconfigure
+groupmod --gid ${JENKINS_GID} jenkins
+groupmod --gid ${DOCKER_HOST_GID} docker
+usermod --uid ${JENKINS_UID} jenkins
+chown -R ${JENKINS_UID}:root /data
+chown -R ${JENKINS_UID}:${JENKINS_GID} "${JENKINS_HOME}"
+
+su -c "/start-jenkins" jenkins
