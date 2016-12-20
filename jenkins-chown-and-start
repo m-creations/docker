@@ -6,5 +6,6 @@ groupmod --gid ${DOCKER_HOST_GID} docker
 usermod --uid ${JENKINS_UID} jenkins
 chown -R ${JENKINS_UID}:root /data
 chown -R ${JENKINS_UID}:${JENKINS_GID} "${JENKINS_HOME}"
-
+chmod g+w ${SSL_CERTIFICATES_DEST_HOME}
+chown root:${JENKINS_GID} ${SSL_CERTIFICATES_DEST_HOME}
 su -c "/start-jenkins" jenkins
